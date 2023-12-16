@@ -126,11 +126,7 @@ NoSaveModeOff:
   return
 
 InternetKillSwitchOn:
-  run, *runas %comspec% /c netsh interface set interface name="Wi-Fi" admin=disabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="Ethernet" admin=disabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="Ethernet 3" admin=disabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="vEthernet (Default Switch)" admin=disabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="vEthernet (WSL)" admin=disabled,,hide
+  networkInterfaceToggle(false)
 
   ToolTip3 := true
   n := getActiveToolTips()
@@ -140,11 +136,7 @@ InternetKillSwitchOn:
   return
 
 InternetKillSwitchOff:
-  run, *runas %comspec% /c netsh interface set interface name="Wi-Fi" admin=enabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="Ethernet" admin=enabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="Ethernet 3" admin=enabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="vEthernet (Default Switch)" admin=enabled,,hide
-  run, *runas %comspec% /c netsh interface set interface name="vEthernet (WSL)" admin=enabled,,hide
+  networkInterfaceToggle()
 
   n := getActiveToolTips()
   ToolTip3 := false
@@ -153,6 +145,14 @@ InternetKillSwitchOff:
   ToolTip, INTERNET KILL SWITCH OFF, 10, %yPos%, 3
   SetTimer, RemoveToolTip3, -3000
   return
+
+networkInterfaceToggle(enable=true) {
+  interfaces := ["Wi-Fi", "Ethernet", "Ethernet 3", "vEthernet (Default Switch)", "vEthernet (WSL)"]
+  for each, interface in interfaces
+  {
+    run, *runas %comspec% /c netsh interface set interface name=%interface% admin=enable ? enabled : disabled,,hide
+  }
+}
 
 dialNumber(n) {
   Send {MButton}
